@@ -1,13 +1,15 @@
-from django.http import JsonResponse
-import json
+
+from django.forms.models import model_to_dict
+from rest_framework.response import Response
+from rest_framework.decorators import api_view
+
+from products.models import Product
 # Create your views here.
 
+@api_view(["GET"])
 def api_home(request, *args, **kwargs):
-    body = request.body
+    model_data = Product.objects.all().order_by("?").first()
     data = {}
-    try:
-        data = json.loads(body)
-    except:
-        pass
-    print(data.keys())
-    return JsonResponse({"message": "Hi there, this is your Django API response"})
+    if model_data:
+       data = model_to_dict(model_data, fields=['id', 'title', 'price', 'sale_price'])
+    return Response(data)
